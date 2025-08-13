@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>DMN 안정화 훈련</title>
+<style>
+    body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }
+    header { background: #2c3e50; color: white; padding: 1em; text-align: center; }
+    main { max-width: 800px; margin: auto; padding: 1em; }
+    section { background: white; padding: 1em; margin-bottom: 1em; border-radius: 5px; }
+    h2 { margin-top: 0; }
+    .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
+    .day { padding: 10px; border: 1px solid #ccc; cursor: pointer; }
+    .checked { background-color: #2ecc71; color: white; }
+    textarea { width: 100%; height: 150px; }
+</style>
+</head>
+<body>
+<header>
+    <h1>DMN 안정화 훈련</h1>
+    <p>문의: qwertwertgg@gmail.com</p>
+</header>
+<main>
+    <section>
+        <h2>DMN이란?</h2>
+        <p>DMN(Default Mode Network)은 뇌의 기본 모드 네트워크로, 의식이 쉬고 있을 때 활성화됩니다. 무의식을 다루는 핵심 네트워크입니다.</p>
+    </section>
+    <section>
+        <h2>호흡 훈련</h2>
+        <p>5초 들이마시고, 5초 내쉬기를 반복하세요.</p>
+        <button onclick="startBreathing()">시작</button>
+        <div id="breathingDisplay"></div>
+    </section>
+    <section>
+        <h2 id="calendarTitle"></h2>
+        <div class="calendar" id="calendar"></div>
+    </section>
+    <section>
+        <h2>자유쓰기 3분</h2>
+        <textarea id="freeWrite"></textarea>
+        <p>남은 시간: <span id="timer">180</span>초</p>
+        <button onclick="startFreeWriting()">시작</button>
+    </section>
+</main>
+<script>
+// 로컬스토리지 로드
+let checkedDays = JSON.parse(localStorage.getItem('checkedDays') || '[]');
+let freeWriteContent = localStorage.getItem('freeWriteContent') || '';
+document.getElementById('freeWrite').value = freeWriteContent;
+
+// 달력 생성
+function generateCalendar() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    document.getElementById('calendarTitle').innerText = `${year}년 ${month+1}월`;
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const lastDate = new Date(year, month+1, 0).getDate();
+
+    const calendarEl = document.getElementById('calendar');
+    calendarEl.innerHTML = '';
+
+    for (let i = 0; i < firstDay; i++) {
+        calendarEl.innerHTML += '<div></div>';
+    }
+
+    for (let day = 1; day <= lastDate; day++) {
+        const dayEl = document.createElement('div');
+        dayEl.className = 'day';
+        if (checkedDays.includes(`${year}-${month}-${day}`)) {
+            dayEl.classList.add('checked');
+        }
+        dayEl.innerText = day;
+        dayEl.onclick = () => {
+            const key = `${year}-${month}-${day}`;
+            if (checkedDays.includes(key)) {
+                checkedDays = checkedDays.filter(d => d !== key);
+            } else {
+                checkedDays.push(key);
+            }
+            localStorage.setItem('checkedDays', JSON.stringify(checkedDays));
+            generateCalendar();
+        }
+        calendarEl.appendChild(dayEl);
+    }
+}
+
+// 호흡훈련
+function startBreathing() {
+    let state = '들이마시기';
+    let time = 5;
+    document.getElementById('breathingDisplay').innerText = `${state} ${time}`;
+    const interval = setInterval(() => {
+        time--;
+        if (time <= 0) {
+            if (state === '들이마시기') {
+                state = '내쉬기';
+            } else {
+                state = '들이마시기';
+            }
+            time = 5;
+        }
+        document.getElementById('breathingDisplay').innerText = `${state} ${time}`;
+    }, 1000);
+}
+
+// 자유쓰기
+function startFreeWriting() {
+    let time = 180;
+    document.getElementById('timer').innerText = time;
+    const textarea = document.getElementById('freeWrite');
+    textarea.disabled = false;
+    const interval = setInterval(() => {
+        time--;
+        document.getElementById('timer').innerText = time;
+        if (time <= 0) {
+            clearInterval(interval);
+            textarea.disabled = true;
+        }
+    }, 1000);
+}
+
+document.getElementById('freeWrite').addEventListener('input', (e) => {
+    localStorage.setItem('freeWriteContent', e.target.value);
+});
+
+generateCalendar();
+</script>
+</body>
+</html>
