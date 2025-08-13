@@ -1,131 +1,362 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<title>DMN 안정화 훈련</title>
-<style>
-    body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }
-    header { background: #2c3e50; color: white; padding: 1em; text-align: center; }
-    main { max-width: 800px; margin: auto; padding: 1em; }
-    section { background: white; padding: 1em; margin-bottom: 1em; border-radius: 5px; }
-    h2 { margin-top: 0; }
-    .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
-    .day { padding: 10px; border: 1px solid #ccc; cursor: pointer; }
-    .checked { background-color: #2ecc71; color: white; }
-    textarea { width: 100%; height: 150px; }
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DefaultModeNetwork · dmn.kr</title>
+  <meta name="description" content="나의 90%는 무의식이다 — DMN(Default Mode Network) 안정화를 위한 간단한 훈련: 호흡, 걷기, 자유쓰기. 8주 플랜 포함." />
+  <style>
+    :root{
+      --bg1:#ecfeff; /* sky-50 tint */
+      --bg2:#e0f2fe; /* sky-100 */
+      --ink:#0a0a0a;
+      --muted:#4b5563;
+      --card:rgba(255,255,255,.75);
+      --radius:22px;
+      --shadow:0 10px 30px rgba(0,0,0,.06);
+      --border:1px solid rgba(0,0,0,.06);
+      --brand:#0ea5e9; /* sky-500 */
+      --brand2:#14b8a6; /* teal-500 */
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Noto Sans KR, Apple SD Gothic Neo, "Malgun Gothic", sans-serif;
+      color:var(--ink);
+      background: linear-gradient(180deg, #ecfeff 0%, #f0f9ff 35%, #eef2ff 100%);
+    }
+    .container{max-width:1100px;margin:0 auto;padding:0 16px}
+    header{
+      position:sticky; top:0; z-index:30; backdrop-filter:saturate(1.4) blur(8px);
+      background:rgba(255,255,255,.6); border-bottom:var(--border);
+    }
+    header .row{display:flex; align-items:center; justify-content:space-between; padding:12px 0}
+    nav a{color:var(--ink); text-decoration:none; margin-left:18px; font-size:14px}
+    nav a:hover{opacity:.7}
+    .hero{position:relative; overflow:hidden}
+    .hero .pad{padding:72px 0}
+    .badge{display:inline-flex; align-items:center; gap:8px; font-size:12px; background:var(--card); padding:6px 10px; border-radius:999px; box-shadow:var(--shadow); border:var(--border)}
+    h1{font-size:34px; line-height:1.18; margin:14px 0 0; font-weight:800}
+    .lead{margin-top:12px; color:var(--muted); max-width:720px}
+    .btns{display:flex; gap:10px; margin-top:18px; flex-wrap:wrap}
+    .btn{display:inline-flex; align-items:center; justify-content:center; padding:12px 16px; border-radius:16px; text-decoration:none; border:var(--border)}
+    .btn.primary{background:#0a0a0a; color:#fff}
+    .btn.ghost{background:var(--card); color:var(--ink)}
+
+    section{padding:56px 0}
+    .grid{display:grid; gap:16px}
+    @media (min-width: 768px){ .grid-2{grid-template-columns:1fr 1fr} .grid-3{grid-template-columns:repeat(3,1fr)} }
+
+    .card{background:var(--card); border:var(--border); border-radius:var(--radius); box-shadow:var(--shadow); padding:20px}
+    .title{font-size:22px; font-weight:800}
+    .muted{color:var(--muted)}
+
+    /* Breathing Coach */
+    .coach{display:grid; place-items:center}
+    .orb-wrap{position:relative; width:210px; height:210px}
+    .orb{position:absolute; inset:0; border-radius:999px; background:radial-gradient(100px 100px at 50% 45%, rgba(255,255,255,.85), rgba(255,255,255,.35)); border:var(--border); box-shadow:inset 0 0 40px rgba(0,0,0,.05)}
+    .orb.scale-in{transform:scale(1.15); transition:transform 1s ease-in-out}
+    .orb.scale-out{transform:scale(0.86); transition:transform 1s ease-in-out}
+    .coach .hint{font-size:12px; color:var(--muted); text-align:center; margin-top:10px}
+    .coach .center{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center}
+    .coach .phase{font-size:28px; font-weight:700}
+    .coach .count{font-variant-numeric:tabular-nums; font-size:18px}
+    .coach .controls{display:flex; align-items:center; gap:8px; margin-bottom:8px}
+    .btn.sm{padding:8px 12px; border-radius:14px; font-size:14px}
+
+    /* Exercise cards */
+    .list{list-style:disc; padding-left:18px; margin:10px 0 0}
+
+    /* Phrases & Quotes */
+    .pill{background:rgba(255,255,255,.8); border:var(--border); border-radius:14px; padding:10px 12px}
+    blockquote{font-size:20px; line-height:1.5; margin:0}
+    blockquote footer{margin-top:6px; font-size:14px; color:var(--muted)}
+
+    /* 8-week plan */
+    .week{cursor:pointer; transition:.2s}
+    .week input{width:18px; height:18px}
+    .week .head{display:flex; align-items:flex-start; justify-content:space-between; gap:8px}
+    .week.checked{background:rgba(45,212,191,.18); border-color:#99f6e4}
+    .tag{font-size:11px; letter-spacing:.06em; color:#6b7280}
+    .footer{border-top:var(--border); padding:20px 0; color:#6b7280; font-size:14px}
+
+    /* Nice anchor scroll */
+    html{scroll-behavior:smooth}
+  </style>
 </head>
 <body>
-<header>
-    <h1>DMN 안정화 훈련</h1>
-    <p>문의: qwertwertgg@gmail.com</p>
-</header>
-<main>
-    <section>
-        <h2>DMN이란?</h2>
-        <p>DMN(Default Mode Network)은 뇌의 기본 모드 네트워크로, 의식이 쉬고 있을 때 활성화됩니다. 무의식을 다루는 핵심 네트워크입니다.</p>
-    </section>
-    <section>
-        <h2>호흡 훈련</h2>
-        <p>5초 들이마시고, 5초 내쉬기를 반복하세요.</p>
-        <button onclick="startBreathing()">시작</button>
-        <div id="breathingDisplay"></div>
-    </section>
-    <section>
-        <h2 id="calendarTitle"></h2>
-        <div class="calendar" id="calendar"></div>
-    </section>
-    <section>
-        <h2>자유쓰기 3분</h2>
-        <textarea id="freeWrite"></textarea>
-        <p>남은 시간: <span id="timer">180</span>초</p>
-        <button onclick="startFreeWriting()">시작</button>
-    </section>
-</main>
-<script>
-// 로컬스토리지 로드
-let checkedDays = JSON.parse(localStorage.getItem('checkedDays') || '[]');
-let freeWriteContent = localStorage.getItem('freeWriteContent') || '';
-document.getElementById('freeWrite').value = freeWriteContent;
+  <!-- Header -->
+  <header>
+    <div class="container row">
+      <div style="display:flex;align-items:center;gap:8px;font-weight:700">
+        <span aria-hidden="true">🧠</span>
+        <span>DefaultModeNetwork</span>
+        <span style="opacity:.45">· dmn.kr</span>
+      </div>
+      <nav aria-label="주요 메뉴">
+        <a href="#about">DMN이란?</a>
+        <a href="#train">무의식 훈련</a>
+        <a href="#plan">8주 플랜</a>
+        <a href="#contact">문의</a>
+      </nav>
+    </div>
+  </header>
 
-// 달력 생성
-function generateCalendar() {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = now.getMonth();
-    document.getElementById('calendarTitle').innerText = `${year}년 ${month+1}월`;
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container pad">
+      <div class="badge">✨ 나의 90%는 무의식이다</div>
+      <h1>의식만 바꾸는 훈련을 넘어,
+        <span style="display:block">DMN 안정화로 몸-마음-생각을 정렬합니다.</span></h1>
+      <p class="lead">더 나아지려는 시도가 실패하는 이유는 10%의 의식만 재무장하기 때문입니다. 생각·감정·습관의 90%를 차지하는 무의식을 다루는 간단한 루틴으로 일상 속에서 차분함과 명료함을 회복하세요.</p>
+      <div class="btns">
+        <a class="btn primary" href="#train">3분 시작하기</a>
+        <a class="btn ghost" href="#plan">8주 훈련 플랜 보기</a>
+      </div>
+    </div>
+  </section>
 
-    const firstDay = new Date(year, month, 1).getDay();
-    const lastDate = new Date(year, month+1, 0).getDate();
+  <!-- About + Coach -->
+  <section id="about">
+    <div class="container grid grid-2" style="align-items:center">
+      <div>
+        <div class="title">DMN(Default Mode Network) 이란?</div>
+        <p class="muted" style="margin-top:12px; line-height:1.8">DMN은 뇌가 쉬는 듯 보일 때 활성화되는 네트워크로, 자기참조적 생각(잡생각), 과거·미래 반추, 타인의 시선 상상 등과 관련됩니다. 과활성화되면 불안과 번아웃을 키우고, 안정화되면 현재·감각·행동이 정렬되어 에너지가 회복됩니다.</p>
+        <ul class="list muted">
+          <li>현재 감각과의 접속(호흡·몸감각)으로 과잉 반추를 낮춥니다.</li>
+          <li>좌·우 리듬(걷기, 양측 자극)이 주의 전환을 돕습니다.</li>
+          <li>자유쓰기로 무의식의 내용을 안전하게 표출·정리합니다.</li>
+        </ul>
+      </div>
+      <div class="card coach" aria-labelledby="breath-title">
+        <div id="breath-title" class="title" style="font-size:18px">호흡 동조 (4초 들숨 · 6초 날숨)</div>
+        <div class="orb-wrap" aria-live="polite">
+          <div id="orb" class="orb scale-out" aria-hidden="true"></div>
+          <div class="center">
+            <div class="controls">
+              <button id="toggle" class="btn sm">▶ 시작</button>
+              <button id="reset" class="btn sm">↺ 리셋</button>
+            </div>
+            <div class="hint" id="hint">시작을 눌러보세요</div>
+            <div class="phase" id="phase">들숨</div>
+            <div class="count" id="count">· · ·</div>
+          </div>
+        </div>
+        <div class="hint">어깨 힘을 빼고, 복부의 부드러운 움직임을 관찰합니다.</div>
+      </div>
+    </div>
+  </section>
 
-    const calendarEl = document.getElementById('calendar');
-    calendarEl.innerHTML = '';
+  <!-- Training cards -->
+  <section id="train">
+    <div class="container">
+      <div class="title">간단한 무의식 훈련 3가지</div>
+      <p class="muted" style="margin-top:6px">하루 총 10~20분. 꾸준함이 핵심입니다.</p>
+      <div class="grid grid-3" style="margin-top:16px">
+        <div class="card">
+          <div style="font-weight:700">호흡 동조 (5분)</div>
+          <p class="muted" style="margin-top:8px">4초 들숨 · 6초 날숨. 횡격막을 사용하며 복부의 부드러운 움직임을 관찰합니다.</p>
+          <ul class="list muted">
+            <li>편안히 앉는다</li>
+            <li>콧길로 4초 들숨</li>
+            <li>입술 오므려 6초 날숨</li>
+            <li>어깨 힘 빼고 5분 반복</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div style="font-weight:700">양측 자극 걷기 (10분)</div>
+          <p class="muted" style="margin-top:8px">손발을 앞뒤로 리듬 있게. 좌·우 감각을 번갈아 인식하여 DMN 과활성에서 벗어납니다.</p>
+          <ul class="list muted">
+            <li>고개는 정면</li>
+            <li>왼발-오른손, 오른발-왼손 스윙</li>
+            <li>발바닥 감각 번갈아 인식</li>
+            <li>생각이 떠오르면 다시 발로</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div style="font-weight:700">자유쓰기 (3분)</div>
+          <p class="muted" style="margin-top:8px">떠오르는 단어를 검열 없이 이어 적습니다. “지금 떠오르는 것은…”으로 시작해 보세요.</p>
+          <ul class="list muted">
+            <li>타이머 3분 설정</li>
+            <li>멈추지 않고 계속 적기</li>
+            <li>판단·평가 금지</li>
+            <li>끝나면 1줄 요약</li>
+          </ul>
+        </div>
+      </div>
 
-    for (let i = 0; i < firstDay; i++) {
-        calendarEl.innerHTML += '<div></div>';
+      <!-- Phrases & Quotes -->
+      <div class="grid grid-2" style="margin-top:18px">
+        <div class="card">
+          <div style="font-weight:700">차분해지는 문구</div>
+          <div style="display:grid; gap:8px; margin-top:8px">
+            <div class="pill">숨을 깊게 들이마시고 천천히 내쉰다.</div>
+            <div class="pill">몸의 무게를 바닥에 맡긴다.</div>
+            <div class="pill">생각은 하늘의 구름처럼 흘러가게 둔다.</div>
+            <div class="pill">지금-여기 감각으로 돌아온다.</div>
+          </div>
+        </div>
+        <div class="card" style="display:flex; flex-direction:column; min-height:160px">
+          <div style="font-weight:700">스토아 학파의 한 줄</div>
+          <div style="flex:1; display:flex; align-items:center">
+            <blockquote id="quote">
+              “행복은 외부 사건이 아니라, 그것을 바라보는 우리의 판단에서 온다.”
+              <footer>— 마르쿠스 아우렐리우스</footer>
+            </blockquote>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8-week plan -->
+  <section id="plan">
+    <div class="container">
+      <div class="title">DMN 안정화 8주 플랜</div>
+      <p class="muted" style="margin-top:6px">주당 5일, 하루 10~20분이면 충분합니다. 완료한 주를 체크하세요 (로컬 저장).</p>
+      <div id="weeks" class="grid" style="grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); margin-top:16px"></div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact">
+    <div class="container">
+      <div class="card">
+        <div class="title">사업 제휴 및 문의</div>
+        <p class="muted" style="margin-top:8px">📧 qwertwertgg@gmail.com</p>
+        <p class="muted">URL: dmn.kr</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="container footer">
+    <div>© <span id="year"></span> DefaultModeNetwork · dmn.kr</div>
+    <div>“나의 90%는 무의식이다” — 의식/무의식의 조화를 훈련합니다.</div>
+  </div>
+
+  <script>
+    // ===== Year
+    document.getElementById('year').textContent = new Date().getFullYear()
+
+    // ===== Stoic quotes rotator
+    const quotes = [
+      { author: '마르쿠스 아우렐리우스', text: '행복은 외부 사건이 아니라, 그것을 바라보는 우리의 판단에서 온다.' },
+      { author: '에픽테토스', text: '우리에게 일어나는 일이 문제가 아니라, 그것에 대한 우리의 반응이 문제다.' },
+      { author: '세네카', text: '지혜로운 자는 자신을 통치하고, 어리석은 자는 충동에 끌려다닌다.' },
+      { author: '에픽테토스', text: '먼저 무엇이 되고 싶은지 스스로에게 말하라. 그리고 그에 맞게 행동하라.' },
+    ]
+    let qi = 0
+    setInterval(() => {
+      qi = (qi + 1) % quotes.length
+      const q = quotes[qi]
+      const el = document.getElementById('quote')
+      el.style.opacity = '0'
+      setTimeout(() => {
+        el.innerHTML = `“${q.text}”<footer>— ${q.author}</footer>`
+        el.style.opacity = '1'
+      }, 250)
+    }, 7000)
+
+    // ===== Breathing coach (4-6)
+    const toggleBtn = document.getElementById('toggle')
+    const resetBtn = document.getElementById('reset')
+    const phaseEl = document.getElementById('phase')
+    const countEl = document.getElementById('count')
+    const hintEl = document.getElementById('hint')
+    const orb = document.getElementById('orb')
+
+    let running = false
+    let timer = null
+    let phase = '들숨'
+    let remaining = 4
+
+    function updateUI(){
+      phaseEl.textContent = phase
+      countEl.textContent = running ? remaining : '· · ·'
+      orb.className = 'orb ' + (phase === '들숨' ? 'scale-in' : 'scale-out')
+      hintEl.textContent = running ? '호흡 동조' : '시작을 눌러보세요'
+      toggleBtn.textContent = running ? '⏸ 멈춤' : '▶ 시작'
     }
 
-    for (let day = 1; day <= lastDate; day++) {
-        const dayEl = document.createElement('div');
-        dayEl.className = 'day';
-        if (checkedDays.includes(`${year}-${month}-${day}`)) {
-            dayEl.classList.add('checked');
-        }
-        dayEl.innerText = day;
-        dayEl.onclick = () => {
-            const key = `${year}-${month}-${day}`;
-            if (checkedDays.includes(key)) {
-                checkedDays = checkedDays.filter(d => d !== key);
-            } else {
-                checkedDays.push(key);
-            }
-            localStorage.setItem('checkedDays', JSON.stringify(checkedDays));
-            generateCalendar();
-        }
-        calendarEl.appendChild(dayEl);
+    function tick(){
+      if (!running) return
+      if (remaining > 1){
+        remaining -= 1
+        updateUI()
+      } else {
+        // phase change
+        if (phase === '들숨'){ phase = '날숨'; remaining = 6 }
+        else { phase = '들숨'; remaining = 4 }
+        updateUI()
+      }
     }
-}
 
-// 호흡훈련
-function startBreathing() {
-    let state = '들이마시기';
-    let time = 5;
-    document.getElementById('breathingDisplay').innerText = `${state} ${time}`;
-    const interval = setInterval(() => {
-        time--;
-        if (time <= 0) {
-            if (state === '들이마시기') {
-                state = '내쉬기';
-            } else {
-                state = '들이마시기';
-            }
-            time = 5;
-        }
-        document.getElementById('breathingDisplay').innerText = `${state} ${time}`;
-    }, 1000);
-}
+    toggleBtn.addEventListener('click', () => {
+      running = !running
+      if (running){
+        phase = '들숨'; remaining = 4; updateUI()
+        timer = setInterval(tick, 1000)
+      } else {
+        clearInterval(timer)
+        updateUI()
+      }
+    })
 
-// 자유쓰기
-function startFreeWriting() {
-    let time = 180;
-    document.getElementById('timer').innerText = time;
-    const textarea = document.getElementById('freeWrite');
-    textarea.disabled = false;
-    const interval = setInterval(() => {
-        time--;
-        document.getElementById('timer').innerText = time;
-        if (time <= 0) {
-            clearInterval(interval);
-            textarea.disabled = true;
-        }
-    }, 1000);
-}
+    resetBtn.addEventListener('click', () => {
+      running = false; clearInterval(timer); phase = '들숨'; remaining = 4; updateUI()
+    })
 
-document.getElementById('freeWrite').addEventListener('input', (e) => {
-    localStorage.setItem('freeWriteContent', e.target.value);
-});
+    updateUI()
 
-generateCalendar();
-</script>
+    // ===== 8-week plan with localStorage
+    const weekData = [
+      '호흡 동조 5분 · 자유쓰기 3분',
+      '걷기 10분 · 호흡 동조 5분',
+      '걷기 10분 · 자유쓰기 5분',
+      '호흡 6-6 · 바디스캔 10분',
+      '걷기 15분 · 감사 3가지 적기',
+      '디지털 디톡스 30분 + 호흡',
+      '걷기 20분 · 자유쓰기 7분',
+      '하루 통합: 호흡·걷기·쓰기 최소 10분',
+    ]
+
+    const weeksRoot = document.getElementById('weeks')
+    const saved = JSON.parse(localStorage.getItem('dmn.kr/weeks') || '[]')
+    const state = Array(8).fill(false).map((_,i) => saved[i] || false)
+
+    function save(){ localStorage.setItem('dmn.kr/weeks', JSON.stringify(state)) }
+
+    weekData.forEach((txt, i) => {
+      const label = document.createElement('label')
+      label.className = 'card week' + (state[i] ? ' checked' : '')
+
+      const head = document.createElement('div')
+      head.className = 'head'
+
+      const left = document.createElement('div')
+      const tag = document.createElement('div'); tag.className='tag'; tag.textContent = 'WEEK ' + (i+1)
+      const title = document.createElement('div'); title.style.fontWeight='700'; title.textContent = txt
+      left.appendChild(tag); left.appendChild(title)
+
+      const box = document.createElement('input'); box.type='checkbox'; box.checked = !!state[i]
+      box.addEventListener('change', () => {
+        state[i] = box.checked; save(); label.classList.toggle('checked', box.checked)
+      })
+
+      head.appendChild(left); head.appendChild(box)
+      label.appendChild(head)
+
+      if (state[i]){
+        const done = document.createElement('div')
+        done.style.marginTop = '10px'
+        done.style.color = '#115e59'
+        done.style.fontSize = '14px'
+        done.textContent = '완료!'
+        label.appendChild(done)
+      }
+
+      weeksRoot.appendChild(label)
+    })
+  </script>
 </body>
 </html>
